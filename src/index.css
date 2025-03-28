@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.react-p5-wrapper {
+  margin-left: 120px;
+  margin-top: 50px;
+}
+
+.react-p5-wrapper>button {
+  width: 100px;
+}
+
+.react-p5-wrapper>input {
+  width: 100px;
+}

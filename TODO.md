@@ -1,0 +1,6 @@
+- Create Onhover effect for group tags
+- Display min distance and N stats
+- Undo/Redo
+- Zoom-pan
+- Eraser
+- Measuring scale
