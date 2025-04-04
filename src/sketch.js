@@ -254,7 +254,6 @@ export default function sketch(p5) {
             });
         } else {
             points.forEach(point => {
-                
                 p5.fill(point.group !== null ? colours[point.group] : 'black');
                 p5.ellipse(point.x, point.y, ellipseSize, ellipseSize);
             });
