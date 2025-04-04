@@ -14,7 +14,7 @@ code {
 
 .react-p5-wrapper {
   margin-left: 120px;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .react-p5-wrapper>button {
@@ -23,4 +23,9 @@ code {
 
 .react-p5-wrapper>input {
   width: 100px;
+}
+
+.selected-group {
+  opacity: 0.8;
+  border: 2px solid black;
 }
