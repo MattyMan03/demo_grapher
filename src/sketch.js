@@ -9,10 +9,10 @@ export default function sketch(p5) {
     let uploadedImage;
     let hoveredGroup = null;
     let mouseAction = 'draw';
-    let clusterButton, clearPointsButton, clearAllButton, fileInputButton, sliderLabel, clearImageButton, drawButton, eraseButton;
+    let clusterButton, clearPointsButton, clearAllButton, fileInputButton, sliderLabel, clearImageButton, drawButton, eraseButton, statTable;
 
     p5.setup = () => {
-        let canvasWidth = p5.windowWidth * 0.95 - 210;
+        let canvasWidth = p5.windowWidth * 0.95 - 410;
         let canvasHeight = p5.windowHeight * 0.95;
         canvas = p5.createCanvas(canvasWidth, canvasHeight);
 
@@ -26,7 +26,7 @@ export default function sketch(p5) {
                 point.group = groups.findIndex(group => group.some(p => p[0] === point.x && p[1] === point.y));
             });
             let clusterStats = clusterer.reportStats(groups);
-            console.log('Cluster Stats:', clusterStats);
+            updateStatsTable(clusterStats);
         });
 
         numGroupsInput = p5.createInput('12');
@@ -190,6 +190,15 @@ export default function sketch(p5) {
                 }
             });
         }
+        statTable = p5.createDiv('');
+        statTable.id('stat-table');
+        statTable.position(canvas.width + 250, 25);
+        statTable.style('font-size', '14px');
+        statTable.style('font-weight', 'bold');
+        let statText = p5.createDiv('Statistics will appear here after clustering.');
+        statText.id('stat-text');
+        statText.parent(statTable);
+        statText.style('font-size', '12px');
     };
 
     p5.windowResized = () => {    
@@ -205,7 +214,7 @@ export default function sketch(p5) {
         let aspectRatio = oldCanvasWidth / oldCanvasHeight;
     
         // Resize the canvas to fit within the new window dimensions while maintaining aspect ratio
-        let maxWidth = p5.windowWidth * 0.95 - 210;
+        let maxWidth = p5.windowWidth * 0.95 - 410;
         let maxHeight = p5.windowHeight * 0.95;
     
         let canvasWidth, canvasHeight;
@@ -251,6 +260,17 @@ export default function sketch(p5) {
         }
     };
 
+    function updateStatsTable(clusterStats) {
+        let statText = p5.select('#stat-text');
+        statText.html(''); // Clear previous stats
+        clusterStats.forEach((stat, index) => {
+            let groupText = p5.createDiv(`Min Distance: ${stat.stats.minDistance.toFixed(2)} | Avg Distance: ${stat.stats.meanDistance.toFixed(2)}`);
+            groupText.style('font-size', '12px');
+            groupText.style('margin-bottom', '19.4px');
+            groupText.parent(statText);
+        });
+    }
+
     function handleFile(file) {
         if (file.type === 'image') {
             uploadedImage = p5.loadImage(file.data, (img) => {
@@ -262,7 +282,7 @@ export default function sketch(p5) {
                 let aspectRatio = img.width / img.height;
     
                 // Resize the canvas to fit the uploaded image while maintaining its aspect ratio
-                let maxWidth = p5.windowWidth * 0.95 - 210;
+                let maxWidth = p5.windowWidth * 0.95 - 410;
                 let maxHeight = p5.windowHeight * 0.95;
     
                 let canvasWidth, canvasHeight;
@@ -361,6 +381,13 @@ export default function sketch(p5) {
                         if (d < sizeSlider.value() / 2) {
                             point.group = mouseAction - 1; // Adjust for zero-based index
                         }
+                        groups.forEach((group, index) => {
+                            groups[index] = group.filter(p => p5.dist(p[0], p[1], p5.mouseX, p5.mouseY) > sizeSlider.value() / 2);
+                        });
+                        groups[mouseAction - 1].push([p5.mouseX, p5.mouseY]);
+                        console.log(groups);
+                        let clusterer = new MaxDistanceClustering(numGroupsInput.value());
+                        updateStatsTable(clusterer.reportStats(groups));
                     });
                 } else {
                     console.warn(`Invalid group number: ${mouseAction}. Must be between 1 and ${numGroupsInput.value()}.`);
@@ -371,4 +398,17 @@ export default function sketch(p5) {
 }
 
 // array of colours for each group
-let colours = ['#E6194B', '#3CB44B', '#FFE119', '#4363D8', '#F58231', '#911EB4', '#42D4F4', '#F032E6', '#BFEF45', '#FABED4', '#469990', '#DCBEFF'];
+let colours = [
+    'rgba(230, 25, 75, 0.8)', 
+    'rgba(60, 180, 75, 0.8)', 
+    'rgba(255, 225, 25, 0.8)', 
+    'rgba(67, 99, 216, 0.8)', 
+    'rgba(245, 130, 49, 0.8)', 
+    'rgba(145, 30, 180, 0.8)', 
+    'rgba(66, 212, 244, 0.8)', 
+    'rgba(240, 50, 230, 0.8)', 
+    'rgba(191, 239, 69, 0.8)', 
+    'rgba(250, 190, 212, 0.8)', 
+    'rgba(70, 153, 144, 0.8)', 
+    'rgba(220, 190, 255, 0.8)'
+];
