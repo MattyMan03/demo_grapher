@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/demo_grapher/static/css/main.084709e5.css",
+    "main.js": "/demo_grapher/static/js/main.9ad02efe.js",
+    "index.html": "/demo_grapher/index.html",
+    "main.084709e5.css.map": "/demo_grapher/static/css/main.084709e5.css.map",
+    "main.9ad02efe.js.map": "/demo_grapher/static/js/main.9ad02efe.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.084709e5.css",
+    "static/js/main.9ad02efe.js"
+  ]
+}
