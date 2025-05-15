@@ -380,14 +380,13 @@ export default function sketch(p5) {
                         let d = p5.dist(p5.mouseX, p5.mouseY, point.x, point.y);
                         if (d < sizeSlider.value() / 2) {
                             point.group = mouseAction - 1; // Adjust for zero-based index
+                            groups.forEach((group, index) => {
+                                groups[index] = group.filter(p => p5.dist(p[0], p[1], p5.mouseX, p5.mouseY) > sizeSlider.value() / 2);
+                            });
+                            groups[mouseAction - 1].push([ point.x, point.y]);
+                            let clusterer = new MaxDistanceClustering(numGroupsInput.value());
+                            updateStatsTable(clusterer.reportStats(groups));
                         }
-                        groups.forEach((group, index) => {
-                            groups[index] = group.filter(p => p5.dist(p[0], p[1], p5.mouseX, p5.mouseY) > sizeSlider.value() / 2);
-                        });
-                        groups[mouseAction - 1].push([p5.mouseX, p5.mouseY]);
-                        console.log(groups);
-                        let clusterer = new MaxDistanceClustering(numGroupsInput.value());
-                        updateStatsTable(clusterer.reportStats(groups));
                     });
                 } else {
                     console.warn(`Invalid group number: ${mouseAction}. Must be between 1 and ${numGroupsInput.value()}.`);
