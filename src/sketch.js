@@ -12,7 +12,9 @@ export default function sketch(p5) {
     let clusterButton, clearPointsButton, clearAllButton, fileInputButton, sliderLabel, clearImageButton, drawButton, eraseButton;
 
     p5.setup = () => {
-        canvas = p5.createCanvas(1600, 900);
+        let canvasWidth = p5.windowWidth * 0.95 - 210;
+        let canvasHeight = p5.windowHeight * 0.95;
+        canvas = p5.createCanvas(canvasWidth, canvasHeight);
 
         clusterButton = p5.createButton('Create Groups');
         clusterButton.position(10, 70);
@@ -23,6 +25,8 @@ export default function sketch(p5) {
             points.forEach((point, index) => {
                 point.group = groups.findIndex(group => group.some(p => p[0] === point.x && p[1] === point.y));
             });
+            let clusterStats = clusterer.reportStats(groups);
+            console.log('Cluster Stats:', clusterStats);
         });
 
         numGroupsInput = p5.createInput('12');
@@ -99,11 +103,11 @@ export default function sketch(p5) {
                 eraseButton.position(eraseButton.x + 1, eraseButton.y + 1);
             }
             if (mouseAction !== 'draw') {
-                mouseAction = 'draw'; // Set the mouse action to draw
+                mouseAction = 'draw';
                 drawButton.class(`selected-group`);
                 drawButton.position(drawButton.x - 1, drawButton.y - 1);
             } else {
-                mouseAction = 'erase'; // Reset to erase action
+                mouseAction = 'erase';
                 drawButton.class('');
                 drawButton.position(drawButton.x + 1, drawButton.y + 1);
                 eraseButton.class('selected-group');
@@ -138,11 +142,11 @@ export default function sketch(p5) {
                 drawButton.position(drawButton.x + 1, drawButton.y + 1);
             }
             if (mouseAction !== 'erase') {
-                mouseAction = 'erase'; // Set the mouse action to erase
+                mouseAction = 'erase';
                 eraseButton.class(`selected-group`);
                 eraseButton.position(eraseButton.x - 1, eraseButton.y - 1);
             } else {
-                mouseAction = 'draw'; // Reset to draw action
+                mouseAction = 'draw';
                 eraseButton.class('');
                 eraseButton.position(eraseButton.x + 1, eraseButton.y + 1);
                 drawButton.class('selected-group');
@@ -150,11 +154,11 @@ export default function sketch(p5) {
             }
         });
 
-        let increment = -36;
+        let increment = -30;
         for (let index = 0; index < colours.length; index++) {
             let groupText = p5.createP(`Group ${index + 1}`);
-            groupText.id(`group-label-${index}`); // Assign a unique ID
-            groupText.position(canvas.width + 130, (increment += 40));
+            groupText.id(`group-label-${index}`);
+            groupText.position(canvas.width + 130, (increment += 35));
             groupText.style('font-size', '16px');
             groupText.style('background-color', colours[index]);
             groupText.style('padding', '5px');
@@ -188,11 +192,11 @@ export default function sketch(p5) {
                 }
                 if (index + 1 >= 1 && index + 1 <= numGroupsInput.value()) {
                     if (mouseAction !== index + 1) {
-                        mouseAction = index + 1; // Set the mouse action to the group number
+                        mouseAction = index + 1;
                         groupText.class(`selected-group`);
                         groupText.position(groupText.x - 1, groupText.y - 1);
                     } else {
-                        mouseAction = 'draw'; // Reset to draw action
+                        mouseAction = 'draw';
                         groupText.class('');
                         groupText.position(groupText.x + 1, groupText.y + 1);
                         drawButton.class('selected-group');
@@ -205,26 +209,118 @@ export default function sketch(p5) {
         }
     };
 
+    p5.windowResized = () => {    
+        // Ensure the canvas and UI elements are initialized before resizing
+        // if (!clusterButton || !numGroupsInput || !clearPointsButton || !clearImageButton || !clearAllButton || !sizeSlider || !sliderLabel || !fileInputButton || !drawButton || !eraseButton) {
+        //     return; // Exit the function if any UI element is not yet initialized
+        // }
+        // Store the old canvas dimensions
+        let oldCanvasWidth = p5.width;
+        let oldCanvasHeight = p5.height;
+    
+        // Calculate the aspect ratio of the canvas
+        let aspectRatio = oldCanvasWidth / oldCanvasHeight;
+    
+        // Resize the canvas to fit within the new window dimensions while maintaining aspect ratio
+        let maxWidth = p5.windowWidth * 0.95 - 210;
+        let maxHeight = p5.windowHeight * 0.95;
+    
+        let canvasWidth, canvasHeight;
+        if (maxWidth / maxHeight > aspectRatio) {
+            canvasHeight = maxHeight;
+            canvasWidth = canvasHeight * aspectRatio;
+        } else {
+            canvasWidth = maxWidth;
+            canvasHeight = canvasWidth / aspectRatio;
+        }
+    
+        p5.resizeCanvas(canvasWidth, canvasHeight);
+    
+        // Scale points' coordinates relative to the new canvas size
+        points = points.map(point => {
+            return {
+                x: (point.x / oldCanvasWidth) * canvasWidth,
+                y: (point.y / oldCanvasHeight) * canvasHeight,
+                group: point.group
+            };
+        });
+    
+        // Reposition buttons and UI elements relative to the new canvas size
+        clusterButton.position(10, 70);
+        numGroupsInput.position(10, 40);
+        numGroupsInput.label.position(10, 10);
+        clearPointsButton.position(10, canvasHeight - 60);
+        clearImageButton.position(10, canvasHeight - 32);
+        clearAllButton.position(10, canvasHeight - 5);
+        sizeSlider.position(10, 120);
+        sliderLabel.position(10, 90);
+        fileInputButton.position(10, 150);
+        drawButton.position(canvasWidth + 130, canvasHeight - 66);
+        eraseButton.position(canvasWidth + 130, canvasHeight - 148);
+    
+        // Reposition group labels
+        let increment = -30;
+        for (let index = 0; index < colours.length; index++) {
+            let groupText = p5.select(`#group-label-${index}`);
+            if (groupText) {
+                groupText.position(canvasWidth + 130, (increment += 35));
+            }
+        }
+    };
+
     function handleFile(file) {
         if (file.type === 'image') {
             uploadedImage = p5.loadImage(file.data, (img) => {
-                p5.resizeCanvas(img.width, img.height);
+                // Store the old canvas dimensions
+                let oldCanvasWidth = p5.width;
+                let oldCanvasHeight = p5.height;
     
-                clusterButton.position(10, 100);
-                numGroupsInput.position(10, 70);
-                numGroupsInput.label.position(10, 40);
-                clearPointsButton.position(10, img.height - 30);
-                clearImageButton.position(10, img.height - 2);
-                clearAllButton.position(10, img.height + 25);
-                sizeSlider.position(10, 150);
-                sliderLabel.position(10, 120);
-                fileInputButton.position(10, 180);
+                // Calculate the aspect ratio of the uploaded image
+                let aspectRatio = img.width / img.height;
     
-                let increment = -28;
+                // Resize the canvas to fit the uploaded image while maintaining its aspect ratio
+                let maxWidth = p5.windowWidth * 0.95 - 210;
+                let maxHeight = p5.windowHeight * 0.95;
+    
+                let canvasWidth, canvasHeight;
+                if (maxWidth / maxHeight > aspectRatio) {
+                    canvasHeight = maxHeight;
+                    canvasWidth = canvasHeight * aspectRatio;
+                } else {
+                    canvasWidth = maxWidth;
+                    canvasHeight = canvasWidth / aspectRatio;
+                }
+    
+                p5.resizeCanvas(canvasWidth, canvasHeight);
+    
+                // Scale points' coordinates relative to the new canvas size
+                points = points.map(point => {
+                    return {
+                        x: (point.x / oldCanvasWidth) * canvasWidth,
+                        y: (point.y / oldCanvasHeight) * canvasHeight,
+                        group: point.group
+                    };
+                });
+    
+                // Reposition buttons and UI elements relative to the new canvas size
+                clusterButton.position(10, 70);
+                numGroupsInput.position(10, 40);
+                numGroupsInput.label.position(10, 10);
+                clearPointsButton.position(10, canvasHeight - 60);
+                clearImageButton.position(10, canvasHeight - 32);
+                clearAllButton.position(10, canvasHeight - 5);
+                sizeSlider.position(10, 120);
+                sliderLabel.position(10, 90);
+                fileInputButton.position(10, 150);
+                drawButton.position(canvasWidth + 130, canvasHeight - 66);
+                eraseButton.position(canvasWidth + 130, canvasHeight - 148);
+    
+                // Reposition group labels
+                let increment = -30;
                 for (let index = 0; index < colours.length; index++) {
-                    let text = p5.select(`#group-label-${index}`);
-                    if (text) {
-                        text.position(img.width + 130, (increment += 32));
+                    let groupText = p5.select(`#group-label-${index}`);
+                    if (groupText) {
+                        groupText.position(canvasWidth + 130, (increment += 35));
                     }
                 }
             });
@@ -288,26 +384,6 @@ export default function sketch(p5) {
                 }
             }
         }
-
-
-        //     // Check if the mouse is over an existing point
-        //     let pointFound = false;
-        //     for (let i = 0; i < points.length; i++) {
-        //         let point = points[i];
-        //         let d = p5.dist(p5.mouseX, p5.mouseY, point.x, point.y);
-        //         if (d < sizeSlider.value() / 2) {
-        //             // If the mouse is over an existing point, bring up dialog box with options
-        //             let groupNum = point.group !== null ? point.group + 1 : 'None';
-        //             pointFound = true;
-        //             break;
-        //         }
-        //     }
-        //     // If the mouse is not over an existing point, add a new point
-        //     if (!pointFound) {
-        //         points.push({x: p5.mouseX, y: p5.mouseY, group: null});
-        //         groups = [];
-        //     }
-        // }
     };
 
     p5.myCustomRedrawAccordingToNewPropsHandler = (newProps) => {
