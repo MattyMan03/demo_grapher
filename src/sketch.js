@@ -73,7 +73,7 @@ export default function sketch(p5) {
         fileInputButton.mousePressed(() => fileInput.elt.click());
 
         drawButton = p5.createP('Draw');
-        drawButton.position(canvas.width + 130, canvas.height - 66);
+        drawButton.position(canvas.width + 130, p5.windowHeight - 120);
         drawButton.id('draw-button');
         drawButton.style('font-size', '16px');
         drawButton.style('background-color', 'lightblue');
@@ -88,35 +88,29 @@ export default function sketch(p5) {
         drawButton.style('user-select', 'none');
 
         drawButton.class('selected-group');
-        drawButton.position(drawButton.x - 1, drawButton.y - 1);
 
         drawButton.mousePressed(() => {
             for (let i = 0; i < colours.length; i++) {
                 let otherText = p5.select(`#group-label-${i}`);
                 if (otherText) {
                     otherText.class('');
-                    otherText.position(otherText.x + 1, otherText.y + 1);
                 }
             }
             if (mouseAction === 'erase') {
                 eraseButton.class('');
-                eraseButton.position(eraseButton.x + 1, eraseButton.y + 1);
             }
             if (mouseAction !== 'draw') {
                 mouseAction = 'draw';
                 drawButton.class(`selected-group`);
-                drawButton.position(drawButton.x - 1, drawButton.y - 1);
             } else {
                 mouseAction = 'erase';
                 drawButton.class('');
-                drawButton.position(drawButton.x + 1, drawButton.y + 1);
                 eraseButton.class('selected-group');
-                eraseButton.position(eraseButton.x - 1, eraseButton.y - 1);
             }
         });
 
         eraseButton = p5.createP('Erase');
-        eraseButton.position(canvas.width + 130, canvas.height - 148);
+        eraseButton.position(canvas.width + 130, p5.windowHeight - 200);
         eraseButton.id('erase-button');
         eraseButton.style('font-size', '16px');
         eraseButton.style('background-color', 'lightcoral');
@@ -134,23 +128,18 @@ export default function sketch(p5) {
                 let otherText = p5.select(`#group-label-${i}`);
                 if (otherText) {
                     otherText.class('');
-                    otherText.position(otherText.x + 1, otherText.y + 1);
                 }
             }
             if (mouseAction === 'draw') {
                 drawButton.class('');
-                drawButton.position(drawButton.x + 1, drawButton.y + 1);
             }
             if (mouseAction !== 'erase') {
                 mouseAction = 'erase';
                 eraseButton.class(`selected-group`);
-                eraseButton.position(eraseButton.x - 1, eraseButton.y - 1);
             } else {
                 mouseAction = 'draw';
                 eraseButton.class('');
-                eraseButton.position(eraseButton.x + 1, eraseButton.y + 1);
                 drawButton.class('selected-group');
-                drawButton.position(drawButton.x - 1, drawButton.y - 1);
             }
         });
 
@@ -179,28 +168,22 @@ export default function sketch(p5) {
                     let otherText = p5.select(`#group-label-${i}`);
                     if (otherText) {
                         otherText.class('');
-                        otherText.position(otherText.x + 1, otherText.y + 1);
                     }
                 }
                 if (mouseAction === 'draw') {
                     drawButton.class('');
-                    drawButton.position(drawButton.x + 1, drawButton.y + 1);
                 }
                 if (mouseAction === 'erase') {
                     eraseButton.class('');
-                    eraseButton.position(eraseButton.x + 1, eraseButton.y + 1);
                 }
                 if (index + 1 >= 1 && index + 1 <= numGroupsInput.value()) {
                     if (mouseAction !== index + 1) {
                         mouseAction = index + 1;
                         groupText.class(`selected-group`);
-                        groupText.position(groupText.x - 1, groupText.y - 1);
                     } else {
                         mouseAction = 'draw';
                         groupText.class('');
-                        groupText.position(groupText.x + 1, groupText.y + 1);
                         drawButton.class('selected-group');
-                        drawButton.position(drawButton.x - 1, drawButton.y - 1);
                     }
                 } else {
                     console.warn(`Invalid group number: ${index + 1}. Must be between 1 and ${numGroupsInput.value()}.`);
@@ -211,9 +194,9 @@ export default function sketch(p5) {
 
     p5.windowResized = () => {    
         // Ensure the canvas and UI elements are initialized before resizing
-        // if (!clusterButton || !numGroupsInput || !clearPointsButton || !clearImageButton || !clearAllButton || !sizeSlider || !sliderLabel || !fileInputButton || !drawButton || !eraseButton) {
-        //     return; // Exit the function if any UI element is not yet initialized
-        // }
+        if (!clusterButton || !numGroupsInput || !clearPointsButton || !clearImageButton || !clearAllButton || !sizeSlider || !sliderLabel || !fileInputButton || !drawButton || !eraseButton) {
+            return; // Exit the function if any UI element is not yet initialized
+        }
         // Store the old canvas dimensions
         let oldCanvasWidth = p5.width;
         let oldCanvasHeight = p5.height;
@@ -255,8 +238,8 @@ export default function sketch(p5) {
         sizeSlider.position(10, 120);
         sliderLabel.position(10, 90);
         fileInputButton.position(10, 150);
-        drawButton.position(canvasWidth + 130, canvasHeight - 66);
-        eraseButton.position(canvasWidth + 130, canvasHeight - 148);
+        drawButton.position(canvasWidth + 130, p5.windowHeight - 120);
+        eraseButton.position(canvasWidth + 130, p5.windowHeight - 200);
     
         // Reposition group labels
         let increment = -30;
@@ -312,8 +295,8 @@ export default function sketch(p5) {
                 sizeSlider.position(10, 120);
                 sliderLabel.position(10, 90);
                 fileInputButton.position(10, 150);
-                drawButton.position(canvasWidth + 130, canvasHeight - 66);
-                eraseButton.position(canvasWidth + 130, canvasHeight - 148);
+                drawButton.position(canvasWidth + 130, p5.windowHeight - 120);
+                eraseButton.position(canvasWidth + 130, p5.windowHeight - 200);
     
                 // Reposition group labels
                 let increment = -30;
@@ -384,11 +367,6 @@ export default function sketch(p5) {
                 }
             }
         }
-    };
-
-    p5.myCustomRedrawAccordingToNewPropsHandler = (newProps) => {
-        if (canvas) // Make sure the canvas has been created
-            p5.fill(newProps.color);
     };
 }
 

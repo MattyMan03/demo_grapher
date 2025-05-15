@@ -1,10 +1,10 @@
 - [x] Create Onhover effect for group tags
 - [x] Eraser
 - [ ] Display min distance and stats
-- [ ] Update algorithm to perform correctly
-- [ ] Polish UI - Resolution changes...
+- [x] Polish UI - Resolution changes...
 
 - [ ] Measuring scale
+- [ ] Update algorithm to not use greedy heuristic
 
 - [ ] Undo/Redo
 - [ ] Zoom-pan
