@@ -12,7 +12,7 @@ export default function sketch(p5) {
     let clusterButton, clearPointsButton, clearAllButton, fileInputButton, sliderLabel, clearImageButton, drawButton, eraseButton, statTable;
 
     p5.setup = () => {
-        let canvasWidth = p5.windowWidth * 0.95 - 410;
+        let canvasWidth = p5.windowWidth * 0.95 - 450;
         let canvasHeight = p5.windowHeight * 0.95;
         canvas = p5.createCanvas(canvasWidth, canvasHeight);
 
@@ -214,7 +214,7 @@ export default function sketch(p5) {
         let aspectRatio = oldCanvasWidth / oldCanvasHeight;
     
         // Resize the canvas to fit within the new window dimensions while maintaining aspect ratio
-        let maxWidth = p5.windowWidth * 0.95 - 410;
+        let maxWidth = p5.windowWidth * 0.95 - 450;
         let maxHeight = p5.windowHeight * 0.95;
     
         let canvasWidth, canvasHeight;
@@ -258,6 +258,9 @@ export default function sketch(p5) {
                 groupText.position(canvasWidth + 130, (increment += 35));
             }
         }
+
+        // Reposition the stats table
+        statTable.position(canvasWidth + 250, 25);
     };
 
     function updateStatsTable(clusterStats) {
@@ -282,7 +285,7 @@ export default function sketch(p5) {
                 let aspectRatio = img.width / img.height;
     
                 // Resize the canvas to fit the uploaded image while maintaining its aspect ratio
-                let maxWidth = p5.windowWidth * 0.95 - 410;
+                let maxWidth = p5.windowWidth * 0.95 - 450;
                 let maxHeight = p5.windowHeight * 0.95;
     
                 let canvasWidth, canvasHeight;
@@ -326,6 +329,9 @@ export default function sketch(p5) {
                         groupText.position(canvasWidth + 130, (increment += 35));
                     }
                 }
+
+                // Reposition the stats table
+                statTable.position(canvasWidth + 250, 25);
             });
         } else {
             console.error('File is not an image.');
